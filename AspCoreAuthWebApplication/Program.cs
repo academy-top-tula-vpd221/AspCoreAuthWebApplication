@@ -40,8 +40,8 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World!");
-app.Map("/admin", [Authorize]() => "Admin page");
+//app.MapGet("/", () => "Hello World!");
+app.Map("/admin", [Authorize]() => new { message = "Admin page" });
 app.Map("/login", (User userData) =>
 {
     User? user = users.FirstOrDefault(u => u.Login == userData.Login);
@@ -66,7 +66,7 @@ app.Map("/login", (User userData) =>
         login = user.Login
     };
 
-    return Results.Json(tokenHandler);
+    return Results.Json(tokenResponse);
 });
 
 app.Run();

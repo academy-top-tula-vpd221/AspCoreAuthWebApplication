@@ -7,9 +7,80 @@
 <body>
     <div id="user_info" style="display:none">
         <p>Welcome <span id="user_login"></span></p>
-        <input type="button" value="Log Out" id="btn_logout" />
-
-        <div 
+        <input type="button" value="Log Out" id="btn_logout" /> 
     </div>
+    <div id="login_form">
+        <p>
+            <label>login</label><br />
+            <input type="text" id="login" />
+        </p>
+        <p>
+            <label>login</label><br />
+            <input type="password" id="password" />
+        </p>
+        <input type="submit" id="btn_submit" value="Log In" />
+    </div>
+    <div>
+        <input type="submit" id="get_data" value="Get data"/>
+    </div>
+    <script>
+        var keyToken = "accessToken";
+
+        document.getElementById("btn_submit")
+            .addEventListener("click", async e => {
+                e.preventDefault();
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        login: document.getElementById("login").value,
+                        password: document.getElementById("password").value
+                    })
+                });
+
+                if (response.ok === true) {
+                    const data = await response.json();
+                    document.getElementById("user_login").innerText = data.login;
+                    document.getElementById("user_info").style.display = "block";
+                    document.getElementById("login_form").style.display = "none";
+
+                    sessionStorage.setItem(keyToken, data.handler);
+                }
+                else {
+                    console.log("Error: ", response.status);
+                }
+            });
+        document.getElementById("get_data").addEventListener("click", async e => {
+            e.preventDefault();
+
+            const token = sessionStorage.getItem(keyToken);
+
+            const response = await fetch("/admin", {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+            });
+
+            if (response.ok === true) {
+                let data = await response.json();
+                alert(data.message);
+            }
+        });
+
+        document.getElementById("btn_logout")
+            .addEventListener("click", e => {
+                e.preventDefault();
+                document.getElementById("user_login").innerText = "";
+                document.getElementById("user_info").style.display = "none";
+                document.getElementById("login_form").style.display = "block";
+                sessionStorage.removeItem(keyToken);
+            });
+    </script>
+
 </body>
 </html>
